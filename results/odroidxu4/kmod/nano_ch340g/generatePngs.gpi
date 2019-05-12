@@ -1,0 +1,49 @@
+#!/usr/bin/gnuplot
+
+set term png notransparent nointerlace truecolor medium size 1280,960 enhanced
+
+# -----------------------------------------------------------------------------
+#  Interrupt latency (Write Start to Interrupt)
+# -----------------------------------------------------------------------------
+set title "Interrupt latency (Write Start to Interrupt)"
+set output "interrupt_latency_write_start_to_interrupt.png"
+
+load "digitalWriteStart_to_interrupt_histogram.gpi"
+
+
+# -----------------------------------------------------------------------------
+#  Interrupt latency (Write End to Interrupt)
+# -----------------------------------------------------------------------------
+set title "Interrupt latency (Write End to Interrupt)"
+set output "interrupt_latency_write_end_to_interrupt.png"
+
+load "digitalWriteEnd_to_interrupt_histogram.gpi"
+
+
+# -----------------------------------------------------------------------------
+#  Time of Serial Write
+# -----------------------------------------------------------------------------
+set title "Time of Serial Write"
+set output "serialWrite.png"
+
+load "startWrite_to_endWrite_histogram.gpi"
+
+
+# -----------------------------------------------------------------------------
+#  Time of Serial Read
+# -----------------------------------------------------------------------------
+set title "Time of Serial Read"
+set output "serialRead.png"
+
+load "startWrite_to_endRead_histogram.gpi"
+
+
+# -----------------------------------------------------------------------------
+#  Time of Serial Write to Interrupt
+# -----------------------------------------------------------------------------
+set title "Time to Interrupt"
+set output "startWrite_to_interrupt.png"
+
+load "startWrite_to_interrupt_histogram.gpi"
+
+
