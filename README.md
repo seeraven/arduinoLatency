@@ -107,6 +107,33 @@ Pin 17 (Input)  (GPIO 22) ----+
 ```
 
 
+### Logic Level Adapter Arduino - Raspberry Pi
+
+For a comparison using the native serial port of the Raspberry Pi connected
+to the Arduino, we use the logic level adapter TXS0108E:
+
+```
+
+Raspberry Pi            TXS0108E       Arduino
+
+Pin 1  (3.3V)    --+--- VA    VB ---- 5V
+                   |
+                  +-+
+                  | | 1k Ohm (brown, black, black, brown, (brown))
+                  +-+
+                   |
+                   +--- OE
+
+Pin 6  (GND)     -------- GND ------- GND
+Pin 7  (GPIO4)   ------ A4    B4 ---- D2
+Pin 8  (TX)      ------ A1    B1 ---- RX
+Pin 10 (RX)      ------ A8    B8 ---- TX
+Pin 35 (GPIO19)  --+
+                   |
+Pin 37 (GPIO26)  --+
+```
+
+
 Tests and Results
 -----------------
 
