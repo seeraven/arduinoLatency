@@ -134,6 +134,32 @@ Pin 37 (GPIO26)  --+
 ```
 
 
+### Logic Level Adapter Arduino - Odroid XU4
+
+Note: *The following connection did not work! There was only garbage on the serial line.*
+
+```
+
+Odroid XU4              TXS0108E       Arduino
+
+Pin 29 (1.8V)    --+--- VA    VB ---- 5V
+                   |
+                  +-+
+                  | | 1k Ohm (brown, black, black, brown, (brown))
+                  +-+
+                   |
+                   +--- OE
+
+Pin 2  (GND)     -------- GND ------- GND
+Pin 27 (GPI37)   ------ A4    B4 ---- D2
+Pin 8  (TX)      ------ A1    B1 ---- RX
+Pin 6  (RX)      ------ A8    B8 ---- TX
+Pin 13 (GPIO21)  --+
+                   |
+Pin 17 (GPIO22)  --+
+```
+
+
 Tests and Results
 -----------------
 
@@ -149,6 +175,7 @@ the OdroidXU4. The results are as follows:
 | Nano    | FTDI FT232RL    | 0.98 [0.80,1.13] ms    | 2.17 [2.14,2.24] ms      | 0.92 [0.87,0.97] ms |
 | Nano    | CH340G          | 2.46 [2.03,2.77] ms    |                          | 2.18 [2.14,2.22] ms |
 | Uno     | ATmega16U2      | 3.16 [2.87,3.42] ms    |                          | 3.18 [3.13,3.22] ms |
+| Nano    | Direct UART     |                        | 197.1 [195.4,200.6] mus  |                     |
 
 Please note that these measurements were taken with setting the FTDI latency
 register to 1ms. As you can see, the OdroidXU4 has more or less the same timings
@@ -157,11 +184,17 @@ FTDI chip. Interestingly enough, it seemed not possible to go below the 2ms with
 the Raspberry Pi. It might be because the USB port on the Raspberry Pi 3B+ is
 actually on the LAN-chip which itself uses USB and can't be deactivated.
 
-Nevertheless, the results vary quite a lot between the individual chips. So the
-next idea was to use an interrupt and measure the time between sending a byte
-and the reaction of the Arduino (putting a pin to high or low). But before we do
-that, we should know how the interrupt latency on the Raspberry Pi 3B+ resp. the
-OdroidXU4 is.
+By using the UART on the Raspberry Pi we determined the fastest possible round trip
+time as about 200 microseconds. As we are using 8n1 we have 10 bits per character
+and require at least 10 / 115200 = 86.8 microseconds to transfer one byte in one
+direction. Unfortunately, the same test was not available on the Odroid XU4 as the
+logic level adapter seems to be sub-optimal for the UART communication.
+
+Nevertheless, the results of the USB based communication variants vary quite a lot
+between the individual chips. So the next idea was to use an interrupt and measure
+the time between sending a byte and the reaction of the Arduino (putting a pin to
+high or low). But before we do that, we should know how the interrupt latency on
+the Raspberry Pi 3B+ resp. the OdroidXU4 is.
 
 
 ### Interrupt latency (WiringPi interrupt handler)
@@ -258,8 +291,12 @@ So using the OdroidXU4, we can now compare the various Arduinos:
 | Nano    | FTDI FT232RL    | 173.79 [153.75,188.38] mus       | 167.19 [147.15,181,78] mus     | 924.46 [874.67,973.83] mus    |
 | Nano    | CH340G          | 136.50 [131.33,148.29] mus       | 129.9 [124.73,141.69] mus      | 2178.58 [2137.75,2219.17] mus |
 | Uno     | ATmega16U2      | 139.08 [134.42,154.25] mus       | 132.48 [127.82,147.65] mus     | 3180.17 [3134.46,3218.96] mus |
+| Nano    | Direct UART     | 101.67 [100.31,105.42] mus       | 99.67 [98.31,103.42] mus       | 197.1 [195.4,200.6] mus       |
 
 It is interesting that the FTDI provides the fastest feedback from the Arduino
 back to the host but requires about 167 microseconds for activating the output
 pin. The CH340G requires only 130 microseconds for the activation but the round
 trip time is with 2.2 ms much higher than the one of the FTDI (0.9ms).
+
+Please note that the direct UART timing was performed on the Raspberry Pi, not
+the Odroid XU4.
